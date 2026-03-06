@@ -1,0 +1,30 @@
+# Go build artifacts
+/bin/
+/*.exe
+/*.dll
+/*.so
+/*.dylib
+
+# Dependency directories
+/vendor/
+
+# Go test output
+*.test
+*.out
+
+# IDE/editor files
+*.idea/
+*.vscode/
+*.swp
+*.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
