@@ -1,7 +1,7 @@
 package user
 
 import (
-	Apperr "CountStud/StructErr"
+	structerr "CountStud/structerr"
 
 	"github.com/google/uuid"
 )
@@ -58,7 +58,7 @@ func (n *User) GetIIN() (iin int) {
 // Methods for changing user data
 func (n *User) ValidateID(id uuid.UUID) error {
 	if n.Id != id {
-		e := Apperr.NewErr("Validation error id")
+		e := structerr.NewErr("Validation error id")
 		return e
 	}
 	return nil
@@ -66,7 +66,7 @@ func (n *User) ValidateID(id uuid.UUID) error {
 
 func (n *User) ChangeName(newName string) error {
 	if newName == "" {
-		return Apperr.NewErr("Name cannot be empty")
+		return structerr.NewErr("Name cannot be empty")
 	}
 	n.Name = newName
 	return nil
@@ -74,7 +74,7 @@ func (n *User) ChangeName(newName string) error {
 
 func (n *User) ChangeLastName(newLastName string) error {
 	if newLastName == "" {
-		return Apperr.NewErr("LastName cannot be empty")
+		return structerr.NewErr("LastName cannot be empty")
 	}
 	n.LastName = newLastName
 	return nil
@@ -82,7 +82,7 @@ func (n *User) ChangeLastName(newLastName string) error {
 
 func (n *User) ChangeAddress(newAddress string) error {
 	if newAddress == "" {
-		return Apperr.NewErr("Address cannot be empty")
+		return structerr.NewErr("Address cannot be empty")
 	}
 	n.Address = newAddress
 	return nil

@@ -1,4 +1,4 @@
-package apperror
+package structerr
 
 type Err struct {
 	Message string `json:"error"`

@@ -1,7 +1,8 @@
 package handlers
 
 import (
-	usersSt "CountStud/user"
+	usersSt "CountStud/User"
+	structerr "CountStud/structerr"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,6 +31,17 @@ failed:
   - response body: JSON with error + time
 */
 
-func (s *HTTPhandler) HandleCreateStudent(router *gin.Context) {
-	router.POST()
+func (s *HTTPhandler) HandleCreateStudent(c *gin.Context) {
+	var student HTTPhandler
+	var newErr structerr.Err
+
+	if err := c.ShouldBind(&student); err != nil {
+		newErr = structerr.Err{
+			Message: err.Error(),
+			HasErr:  true,
+		}
+		c.JSON(400, newErr)
+		return
+	}
+
 }

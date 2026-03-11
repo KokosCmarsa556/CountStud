@@ -1,10 +1,10 @@
 package main
 
 import (
+	user "CountStud/User"
+	simpleWork "CountStud/database/SimpleWork"
 	"CountStud/database/connection"
-	"CountStud/database/simplework"
 	"CountStud/handlers"
-	"CountStud/user"
 	"context"
 	"log"
 
@@ -17,10 +17,9 @@ func main() {
 
 	ginRoute := gin.Default()
 
-	ginRoute.ServeHTTP(":8989")
 	httpHandler := handlers.NewHttpHandlers(student)
-
 	ctx := context.Background()
+
 	//Accessing the env file
 	err := godotenv.Load()
 	if err != nil {
@@ -34,12 +33,14 @@ func main() {
 	}
 
 	// Выполняем создание таблицы
-	if err := simplework.CreateTable(ctx, conn); err != nil {
+	if err := simpleWork.CreateTable(ctx, conn); err != nil {
 		log.Fatal(err)
 	}
 
+	ginRoute.POST("/student", httpHandler.HandleCreateStudent)
 	// Вставляем в БД
 	// if err := simplework.InsertRow(ctx, conn, user.User.Name); err != nil {
 	// 	log.Fatal(err)
 	// }
+	ginRoute.Run(":8989")
 }
