@@ -16,8 +16,6 @@ func main() {
 	student := user.NewUser()
 
 	ginRoute := gin.Default()
-
-	httpHandler := handlers.NewHttpHandlers(student)
 	ctx := context.Background()
 
 	//Accessing the env file
@@ -31,7 +29,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	httpHandler := handlers.NewHttpHandlers(student, conn)
 	// Выполняем создание таблицы
 	if err := simpleWork.CreateTable(ctx, conn); err != nil {
 		log.Fatal(err)

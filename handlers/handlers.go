@@ -2,18 +2,23 @@ package handlers
 
 import (
 	usersSt "CountStud/User"
+	SimpleWork "CountStud/database/SimpleWork"
 	structerr "CountStud/structerr"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 type HTTPhandler struct {
 	Student *usersSt.User
+	conn    *pgx.Conn
 }
 
-func NewHttpHandlers(u *usersSt.User) *HTTPhandler {
+func NewHttpHandlers(u *usersSt.User, conn *pgx.Conn) *HTTPhandler {
 	return &HTTPhandler{
 		Student: u,
+		conn:    conn,
 	}
 }
 
@@ -32,10 +37,11 @@ failed:
 */
 
 func (s *HTTPhandler) HandleCreateStudent(c *gin.Context) {
-	var student HTTPhandler
+	student := &usersSt.User{}
 	var newErr structerr.Err
+	ctxFromGin := c.Request.Context()
 
-	if err := c.ShouldBind(&student); err != nil {
+	if err := c.ShouldBindJSON(student); err != nil {
 		newErr = structerr.Err{
 			Message: err.Error(),
 			HasErr:  true,
@@ -44,4 +50,17 @@ func (s *HTTPhandler) HandleCreateStudent(c *gin.Context) {
 		return
 	}
 
+	student.Id = uuid.New()
+
+	err := SimpleWork.InsertRow(ctxFromGin, s.conn, student)
+
+	if err != nil {
+		newErr = structerr.Err{
+			Message: err.Error(),
+			HasErr:  true,
+		}
+		c.JSON(500, newErr)
+		return
+	}
+	c.JSON(201, student)
 }

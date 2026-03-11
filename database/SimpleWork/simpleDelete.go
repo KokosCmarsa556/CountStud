@@ -1,8 +1,9 @@
-package simplework
+package simpleWork
 
 import (
 	user "CountStud/User"
 	"context"
+
 	"github.com/jackc/pgx/v5"
 )
 

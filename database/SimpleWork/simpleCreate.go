@@ -1,4 +1,4 @@
-package simplework
+package simpleWork
 
 import (
 	structerr "CountStud/structerr"
