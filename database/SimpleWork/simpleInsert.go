@@ -1,4 +1,4 @@
-package simplework
+package simpleWork
 
 import (
 	user "CountStud/User"
@@ -10,10 +10,19 @@ import (
 func InsertRow(ctx context.Context, conn *pgx.Conn, student *user.User) error {
 	sqlInsert := `
 		INSERT INTO students (Name, First_Name, Last_Name, Gender, Address, Iin)
-		VALUES($1, $2, $3, $4, $5, $6)
+		VALUES($1, $2, $3, $4, $5, $6, $7)
 	`
 
-	if _, err := conn.Exec(ctx, sqlInsert, student.Name, student.FirstName, student.LastName, student.Gender, student.Address, student.IIN); err != nil {
+	if _, err := conn.Exec(
+		ctx,
+		sqlInsert,
+		student.Id,
+		student.Name,
+		student.FirstName,
+		student.LastName,
+		student.Gender,
+		student.Address,
+		student.IIN); err != nil {
 		return err
 	}
 	return nil

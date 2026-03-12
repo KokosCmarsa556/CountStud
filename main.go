@@ -1,7 +1,7 @@
 package main
 
 import (
-	user "CountStud/User"
+	_ "CountStud/User"
 	simpleWork "CountStud/database/SimpleWork"
 	"CountStud/database/connection"
 	"CountStud/handlers"
@@ -13,8 +13,6 @@ import (
 )
 
 func main() {
-	student := user.NewUser()
-
 	ginRoute := gin.Default()
 	ctx := context.Background()
 
@@ -29,13 +27,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	httpHandler := handlers.NewHttpHandlers(student, conn)
+	httpHandler := handlers.NewHttpHandlers(conn)
 	// Выполняем создание таблицы
 	if err := simpleWork.CreateTable(ctx, conn); err != nil {
 		log.Fatal(err)
 	}
 
-	ginRoute.POST("/student", httpHandler.HandleCreateStudent)
+	ginRoute.POST("/student", httpHandler.HandlerCreateStudent)
 	// Вставляем в БД
 	// if err := simplework.InsertRow(ctx, conn, user.User.Name); err != nil {
 	// 	log.Fatal(err)
