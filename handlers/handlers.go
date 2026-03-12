@@ -11,14 +11,12 @@ import (
 )
 
 type HTTPhandler struct {
-	Student *usersSt.User
-	conn    *pgx.Conn
+	conn *pgx.Conn
 }
 
-func NewHttpHandlers(u *usersSt.User, conn *pgx.Conn) *HTTPhandler {
+func NewHttpHandlers(conn *pgx.Conn) *HTTPhandler {
 	return &HTTPhandler{
-		Student: u,
-		conn:    conn,
+		conn: conn,
 	}
 }
 
@@ -36,7 +34,7 @@ failed:
   - response body: JSON with error + time
 */
 
-func (s *HTTPhandler) HandleCreateStudent(c *gin.Context) {
+func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
 	student := &usersSt.User{}
 	var newErr structerr.Err
 	ctxFromGin := c.Request.Context()
@@ -63,4 +61,8 @@ func (s *HTTPhandler) HandleCreateStudent(c *gin.Context) {
 		return
 	}
 	c.JSON(201, student)
+}
+
+func (s *HTTPhandler) HandlerGetStudentsID(c *gin.Context) {
+
 }

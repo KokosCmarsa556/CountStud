@@ -39,6 +39,7 @@ func NewUser() *User {
 // }
 
 // Methods for obtaining data
+
 func (n *User) GetName() (name, firstName, lastName string) {
 	return n.Name, n.FirstName, n.LastName
 }
