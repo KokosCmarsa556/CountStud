@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	usersSt "CountStud/User"
 	SimpleWork "CountStud/database/simpleWork"
 	structerr "CountStud/structerr"
+	usersSt "CountStud/user"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -83,14 +83,16 @@ failed:
   - response body: JSON with error + time
 */
 
-func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) (*usersSt.User, error) {
+func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) {
+
 	getIdString := c.Param("id")
 	getIdUUID, err := uuid.Parse(getIdString)
 	if err != nil {
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
-		return nil, &newErr
+		c.JSON(http.StatusBadRequest, newErr)
+		return
 	}
 
 	ctxFromGin := c.Request.Context()
@@ -100,10 +102,10 @@ func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) (*usersSt.User, error)
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
-		return nil, &newErr
+		c.JSON(http.StatusNotFound, newErr)
+		return
 	}
 
 	c.JSON(http.StatusOK, student)
-	return student, nil
-
+	return
 }

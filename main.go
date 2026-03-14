@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "CountStud/User"
 	"CountStud/database/connection"
 	simpleWork "CountStud/database/simpleWork"
 	"CountStud/handlers"
