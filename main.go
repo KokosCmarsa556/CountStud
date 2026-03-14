@@ -2,8 +2,8 @@ package main
 
 import (
 	_ "CountStud/User"
-	simpleWork "CountStud/database/SimpleWork"
 	"CountStud/database/connection"
+	simpleWork "CountStud/database/simpleWork"
 	"CountStud/handlers"
 	"context"
 	"log"
