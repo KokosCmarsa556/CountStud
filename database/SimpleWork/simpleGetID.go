@@ -1,14 +1,15 @@
 package simpleWork
 
 import (
-	user "CountStud/User"
+	user "CountStud/student"
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
-func GetStudentByID(ctx context.Context, conn *pgx.Conn, s *user.User) (*user.User, error) {
+func GetStudentByID(ctx context.Context, conn *pgx.Conn, id uuid.UUID) (*user.User, error) {
 	//Создаем пустого студента куда в дальнейшем будут записываться данные пользователя, которого ищут
 	var student user.User
 
@@ -21,7 +22,7 @@ func GetStudentByID(ctx context.Context, conn *pgx.Conn, s *user.User) (*user.Us
 		2) Передается ID пользователя котого мы ищем
 		3) Возвращется строка с данными о пользователи
 	*/
-	row := conn.QueryRow(ctx, sqlGetId, s.Id)
+	row := conn.QueryRow(ctx, sqlGetId, id)
 
 	//Scan-читает данные из row и записывает их в переменные в которых они должны хранится
 	if err := row.Scan(
