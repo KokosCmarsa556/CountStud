@@ -1,4 +1,4 @@
-package user
+package student
 
 import (
 	structerr "CountStud/structerr"

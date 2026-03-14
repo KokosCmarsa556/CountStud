@@ -3,7 +3,7 @@ package handlers
 import (
 	SimpleWork "CountStud/database/simpleWork"
 	structerr "CountStud/structerr"
-	usersSt "CountStud/user"
+	usersSt "CountStud/student"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
