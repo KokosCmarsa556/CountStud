@@ -4,7 +4,7 @@
 /*.dll
 /*.so
 /*.dylib
-/*.env
+*.env
 # Dependency directories
 /vendor/
 
@@ -28,3 +28,5 @@
 
 # Temporary files
 *.tmp
+
+*.gitignore
