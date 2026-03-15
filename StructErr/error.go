@@ -5,7 +5,7 @@ type Err struct {
 	HasErr  bool   `json:"errBol"`
 }
 
-func NewErr(message string) *Err {
+func (e *Err) New(message string) *Err {
 	return &Err{
 		Message: message,
 		HasErr:  true,

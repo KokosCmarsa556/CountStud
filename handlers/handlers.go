@@ -34,39 +34,29 @@ failed:
   - status code:   400, 409, 500, ...
   - response body: JSON with error + time
 */
-var newErr structerr.Err
+var studentErr structerr.Err
 
 func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
 	student := &usersSt.User{}
 
-	ctxFromGin := c.Request.Context()
+	ginCtx := c.Request.Context()
 
 	if err := c.ShouldBindJSON(student); err != nil {
-		newErr = structerr.Err{
-			Message: err.Error(),
-			HasErr:  true,
-		}
-		c.JSON(400, newErr)
+		studentErr = Err.New(err.Error())
+		c.JSON(400, studentErr)
 		return
 	}
 
-	student.Id = uuid.New()
-
-	err := SimpleWork.InsertRow(ctxFromGin, s.conn, student)
+	err := SimpleWork.InsertRow(ginCtx, s.conn, student)
 
 	if err != nil {
-		newErr = structerr.Err{
-			Message: err.Error(),
-			HasErr:  true,
-		}
-		c.JSON(500, newErr)
+		studentErr = Err.New(err.Error())
+		c.JSON(500, studentErr)
 		return
 	}
+
+	// JWT token
 	c.JSON(http.StatusOK, student)
-}
-
-func (s *HTTPhandler) HandlerGetStudentsID(c *gin.Context) {
-
 }
 
 /*
