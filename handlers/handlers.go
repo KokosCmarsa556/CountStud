@@ -15,6 +15,11 @@ type HTTPhandler struct {
 	conn *pgx.Conn
 }
 
+type studentsAll struct {
+	students []usersSt.User
+}
+
+
 func NewHttpHandlers(conn *pgx.Conn) *HTTPhandler {
 	return &HTTPhandler{
 		conn: conn,
@@ -107,5 +112,23 @@ func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, student)
-	return
+}
+
+func(s *HTTPhandler) HandlerGetAllStudents(c *gin.Context) {
+	var students studentsAll
+	var err error
+
+
+	ctxFromGin := c.Request.Context()
+
+	studnets, err = SimpleWork.GetAllStudent(ctxFromGin, s.conn)
+	if err != nil {
+		newErr = structerr.Err{
+			Message: err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, newErr)
+		return
+	}
+
+	c.
 }
