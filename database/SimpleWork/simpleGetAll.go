@@ -14,7 +14,7 @@ func GetAllStudent(ctx context.Context, conn *pgx.Conn) ([]user.User, error) {
 	`
 
 	rows, err := conn.Query(ctx, sqlGetAll)
-	defer rows.Close()
+
 	if err != nil {
 		return nil, err
 	}
@@ -34,5 +34,6 @@ func GetAllStudent(ctx context.Context, conn *pgx.Conn) ([]user.User, error) {
 		}
 		students = append(students, u)
 	}
+	defer rows.Close()
 	return students, rows.Err()
 }
