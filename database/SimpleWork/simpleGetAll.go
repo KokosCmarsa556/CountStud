@@ -14,11 +14,11 @@ func GetAllStudent(ctx context.Context, conn *pgx.Conn) ([]user.User, error) {
 	`
 
 	rows, err := conn.Query(ctx, sqlGetAll)
-	defer rows.Close()
+
 	if err != nil {
 		return nil, err
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var u user.User
 		if err := rows.Scan(

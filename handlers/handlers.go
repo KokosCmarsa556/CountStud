@@ -19,7 +19,6 @@ type studentsAll struct {
 	students []usersSt.User
 }
 
-
 func NewHttpHandlers(conn *pgx.Conn) *HTTPhandler {
 	return &HTTPhandler{
 		conn: conn,
@@ -114,14 +113,11 @@ func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) {
 	c.JSON(http.StatusOK, student)
 }
 
-func(s *HTTPhandler) HandlerGetAllStudents(c *gin.Context) {
-	var students studentsAll
-	var err error
-
+func (s *HTTPhandler) HandlerGetAllStudents(c *gin.Context) {
 
 	ctxFromGin := c.Request.Context()
 
-	studnets, err = SimpleWork.GetAllStudent(ctxFromGin, s.conn)
+	studnets, err := SimpleWork.GetAllStudent(ctxFromGin, s.conn)
 	if err != nil {
 		newErr = structerr.Err{
 			Message: err.Error(),
@@ -130,5 +126,35 @@ func(s *HTTPhandler) HandlerGetAllStudents(c *gin.Context) {
 		return
 	}
 
-	c.
+	c.JSON(http.StatusOK, studnets)
+}
+
+func (s *HTTPhandler) HandlerDeleteStudent(c *gin.Context) {
+	getIdString := c.Param("id")
+	getIdUUID, err := uuid.Parse(getIdString)
+	if err != nil {
+		newErr = structerr.Err{
+			Message: err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, newErr)
+		return
+	}
+
+	ctxFromGin := c.Request.Context()
+
+	student, err := SimpleWork.GetStudentByID(ctxFromGin, s.conn, getIdUUID)
+	if err != nil {
+		newErr = structerr.Err{
+			Message: err.Error(),
+		}
+		c.JSON(http.StatusNotFound, newErr)
+		return
+	}
+
+	err = SimpleWork.DeleteRow(ctxFromGin, s.conn, student)
+	if err != nil {
+		errSt := structerr.NewErr(err.Error())
+		c.JSON(http.StatusBadRequest, errSt)
+		return
+	}
 }
