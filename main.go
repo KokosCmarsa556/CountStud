@@ -34,6 +34,8 @@ func main() {
 
 	ginRoute.POST("/student", httpHandler.HandlerCreateStudent)
 	ginRoute.GET("/student/:id", httpHandler.HandlerGetStudentID)
+	ginRoute.GET("/students", httpHandler.HandlerGetAllStudents)
+	ginRoute.DELETE("/student/:id", httpHandler.HandlerDeleteStudent)
 	// Вставляем в БД
 	// if err := simplework.InsertRow(ctx, conn, user.User.Name); err != nil {
 	// 	log.Fatal(err)

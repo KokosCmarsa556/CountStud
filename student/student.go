@@ -8,6 +8,7 @@ import (
 
 type User struct {
 	Id        uuid.UUID `json:"id"`
+	Password  string    `json:"password"`
 	Name      string    `json:"name"`
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
@@ -16,27 +17,9 @@ type User struct {
 	IIN       int       `json:"iin"`
 }
 
-// func NewUser(name, firstName, lastName, gender, address string, iin int) *User {
-// 	return &User{
-// 		Id:        uuid.New(),
-// 		Name:      name,
-// 		FirstName: firstName,
-// 		LastName:  lastName,
-// 		Gender:    gender,
-// 		Address:   address,
-// 		IIN:       iin,
-// 	}
-// }
-
 func NewUser() *User {
 	return &User{}
 }
-
-// func NewEmptyUser() *User {
-// 	return &User{
-// 		Id: uuid.New(),
-// 	}
-// }
 
 // Methods for obtaining data
 
