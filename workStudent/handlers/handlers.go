@@ -16,7 +16,7 @@ type HTTPhandler struct {
 }
 
 type studentsAll struct {
-	students []usersSt.User
+	students []usersSt.Student
 }
 
 func NewHttpHandlers(conn *pgx.Conn) *HTTPhandler {
@@ -28,7 +28,7 @@ func NewHttpHandlers(conn *pgx.Conn) *HTTPhandler {
 var newErr structerr.Err
 
 func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
-	student := usersSt.User{}
+	student := usersSt.Student{}
 
 	ctxFromGin := c.Request.Context()
 

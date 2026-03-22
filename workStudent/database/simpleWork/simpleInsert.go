@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func InsertRow(ctx context.Context, conn *pgx.Conn, student *user.User) error {
+func InsertRow(ctx context.Context, conn *pgx.Conn, student *user.Student) error {
 	//Создаем запрос. Не передаем id, т.к он генерируется у нас в PostgreSQL
 	sqlInsert := `
 		INSERT INTO students (Name, First_Name, Last_Name, Gender, Address, Iin)
