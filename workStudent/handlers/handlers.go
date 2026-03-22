@@ -32,7 +32,7 @@ func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
 
 	ctxFromGin := c.Request.Context()
 
-	if err := c.ShouldBindJSON(student); err != nil {
+	if err := c.ShouldBindJSON(&student); err != nil {
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
@@ -78,7 +78,7 @@ func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"error": student})
+	c.JSON(http.StatusOK, student)
 }
 
 func (s *HTTPhandler) HandlerGetAllStudents(c *gin.Context) {

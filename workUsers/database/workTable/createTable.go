@@ -10,6 +10,7 @@ func CreateTable(ctx context.Context, conn *pgx.Conn) error {
 	sqlCreate := `
 		CREATE TABLE IF NOT EXISTS users (
 		Id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+		Login VARCHAR(30) NOT NULL
 		Password VARCHAR(30) NOT NULL
 		Name VARCHAR(150) NOT NULL,
 		First_Name VARCHAR(150) NOT NULL,

@@ -13,7 +13,7 @@ type Student struct {
 	LastName  string    `json:"lastname"`
 	Gender    string    `json:"gender"`
 	Address   string    `json:"address"`
-	IIN       int       `json:"iin"`
+	IIN       string    `json:"iin"`
 }
 
 func NewStudent() *Student {
@@ -34,7 +34,7 @@ func (n *Student) GetGender() (gender string) {
 	return n.Gender
 }
 
-func (n *Student) GetIIN() (iin int) {
+func (n *Student) GetIIN() (iin string) {
 	return n.IIN
 }
 

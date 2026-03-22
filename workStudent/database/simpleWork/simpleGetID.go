@@ -15,7 +15,9 @@ func GetStudentByID(ctx context.Context, conn *pgx.Conn, id uuid.UUID) (*user.St
 
 	// Создание SQL-запроса для получения пользователя по его id
 	sqlGetId := `
-		SELECT * FROM students WHERE id = $1; 
+		SELECT id, name, firstName, lastName, gender, address, iin 
+    FROM students 
+    WHERE id = $1;
 	`
 	/*
 		1) Отправка SQL-запроса в PostgreSQL
