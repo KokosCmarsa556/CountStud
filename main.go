@@ -1,9 +1,9 @@
 package main
 
 import (
-	"CountStud/database/connection"
-	simpleWork "CountStud/database/simpleWork"
-	"CountStud/handlers"
+	"CountStud/workStudent/database/connection"
+	simpleWork "CountStud/workStudent/database/simpleWork"
+	"CountStud/workStudent/handlers"
 	"context"
 	"log"
 

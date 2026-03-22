@@ -1,7 +1,7 @@
 package simpleWork
 
 import (
-	user "CountStud/student"
+	user "CountStud/workStudent/student"
 	"context"
 	"fmt"
 
