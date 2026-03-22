@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type HTTPhandler struct {
@@ -40,19 +39,6 @@ func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
 		c.JSON(400, gin.H{"error": newErr})
 		return
 	}
-
-	if student.Password == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "password is required"})
-		return
-	}
-
-	hash, errCrypto := bcrypt.GenerateFromPassword([]byte(student.Password), bcrypt.DefaultCost)
-	if errCrypto != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errCrypto})
-		return
-	}
-
-	student.Password = string(hash)
 	err := SimpleWork.InsertRow(ctxFromGin, s.conn, &student)
 
 	if err != nil {
