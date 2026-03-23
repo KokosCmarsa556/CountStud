@@ -10,7 +10,7 @@ import (
 type Users struct {
 	Id       uuid.UUID `json:"id"`
 	Login    string    `json:"login"`
-	Password string    `json:"password"`
+	Password string    `json:"_"`
 	Name     string    `json:"name"`
 	SurName  string    `json:"surname"`
 	LastName string    `json:"lastname"`

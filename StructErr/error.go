@@ -12,6 +12,6 @@ func NewErr(message string) *Err {
 	}
 }
 
-func (e *Err) Error() string {
+func (e Err) Error() string {
 	return e.Message
 }

@@ -13,8 +13,8 @@ func CreateTable(ctx context.Context, conn *pgx.Conn) error {
 		Login VARCHAR(30) NOT NULL
 		Password VARCHAR(30) NOT NULL
 		Name VARCHAR(150) NOT NULL,
-		First_Name VARCHAR(150) NOT NULL,
-		Last_Name VARCHAR(150) NOT NULL,
+		FirstName VARCHAR(150) NOT NULL,
+		LastName VARCHAR(150) NOT NULL,
 		Gender VARCHAR(50) NOT NULL,
 		Role VARCHAR(10) NOT NULL,
 	`
