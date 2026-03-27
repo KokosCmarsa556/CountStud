@@ -112,7 +112,6 @@ func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
 
 func (s *HTTPhandler) HandlerEntrance(c *gin.Context) {
 	ctxGin := c.Request.Context()
-	// user := users.Users{}
 	userDTO := userdto.UserDTO{}
 
 	if err := c.ShouldBindJSON(&userDTO); err != nil {
@@ -131,12 +130,25 @@ func (s *HTTPhandler) HandlerEntrance(c *gin.Context) {
 	}
 	if errPass := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userDTO.Password)); errPass != nil {
 		newErr = *structerr.NewErr(errPass.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "неверный пароль"})
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	token, err := s.createJWT(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "ошибка генерации токена"})
+		return
+	}
 
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+		"user": gin.H{
+			"id":    user.Id,
+			"email": user.Email,
+			"name":  user.Name,
+			"role":  user.Role,
+		},
+	})
 }
 
 func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {

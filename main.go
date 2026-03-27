@@ -32,9 +32,13 @@ func main() {
 	if err := simpleWork.CreateTable(ctx, conn); err != nil {
 		log.Fatal(err)
 	}
+
+	ginRoute.POST("/useradmin/authorization", httpHandler.HandlerEntrance)
+	ginRoute.POST("/user/authorization", httpHandler.HandlerEntrance)
 	ginRoute.POST("/useradmin/registration", httpHandler.HandlerCreateAdmin)
 	ginRoute.POST("/user/registration", httpHandler.HandlerCreateUser)
 	ginRoute.POST("/student", httpHandler.HandlerCreateStudent)
+	ginRoute.PATCH("/student/createstudent", httpHandler.HandlerCreateStudent)
 	ginRoute.GET("/student/:id", httpHandler.HandlerGetStudentID)
 	ginRoute.GET("/students", httpHandler.HandlerGetAllStudents)
 	ginRoute.DELETE("/student/:id", httpHandler.HandlerDeleteStudent)
