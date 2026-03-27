@@ -4,11 +4,15 @@ import (
 	structerr "CountStud/structerr"
 	SimpleWork "CountStud/workStudent/database/simpleWork"
 	usersSt "CountStud/workStudent/student"
+	userdto "CountStud/workStudent/userDTO"
 	worktable "CountStud/workUsers/database/workTable"
 	"CountStud/workUsers/users"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -28,9 +32,26 @@ func NewHttpHandlers(conn *pgx.Conn) *HTTPhandler {
 	}
 }
 
+func (s *HTTPhandler) createJWT(user users.Users) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id": user.Id,
+		"role":    user.Role,
+		"exp":     time.Now().Add(24 * time.Hour).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	secretKey := os.Getenv("JWT_SECRET")
+	tokenString, err := token.SignedString([]byte(secretKey))
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
+}
+
 var newErr structerr.Err
 
-func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
+func (s *HTTPhandler) HandlerCreateAdmin(c *gin.Context) {
+
 	ctxGin := c.Request.Context()
 	user := users.Users{}
 
@@ -41,14 +62,13 @@ func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
 		return
 	}
-
+	user.Role = "Admin"
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "ошибка хэширования"})
 		return
 	}
 	user.Password = string(hash)
-	user.Role = "Teacher"
 
 	if err := worktable.InsertRow(ctxGin, s.conn, &user); err != nil {
 		newErr = structerr.Err{
@@ -60,10 +80,69 @@ func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
+
+	ctxGin := c.Request.Context()
+	user := users.Users{}
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		newErr = structerr.Err{
+			Message: err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		return
+	}
+	user.Role = "Teacher"
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "ошибка хэширования"})
+		return
+	}
+	user.Password = string(hash)
+
+	if err := worktable.InsertRow(ctxGin, s.conn, &user); err != nil {
+		newErr = structerr.Err{
+			Message: err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
+func (s *HTTPhandler) HandlerEntrance(c *gin.Context) {
+	ctxGin := c.Request.Context()
+	// user := users.Users{}
+	userDTO := userdto.UserDTO{}
+
+	if err := c.ShouldBindJSON(&userDTO); err != nil {
+		newErr = structerr.Err{
+			Message: err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		return
+	}
+
+	user, err := worktable.GetUser(ctxGin, s.conn, userDTO.Email)
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "пользователь не найден"})
+		return
+	}
+	if errPass := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userDTO.Password)); errPass != nil {
+		newErr = *structerr.NewErr(errPass.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+
+}
+
 func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
 	student := usersSt.Student{}
 
-	ctxFromGin := c.Request.Context()
+	ctxGin := c.Request.Context()
 
 	if err := c.ShouldBindJSON(&student); err != nil {
 		newErr = structerr.Err{
@@ -72,7 +151,7 @@ func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
 		return
 	}
-	err := SimpleWork.InsertRow(ctxFromGin, s.conn, &student)
+	err := SimpleWork.InsertRow(ctxGin, s.conn, &student)
 
 	if err != nil {
 		newErr = structerr.Err{
@@ -96,9 +175,9 @@ func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) {
 		return
 	}
 
-	ctxFromGin := c.Request.Context()
+	ctxGin := c.Request.Context()
 
-	student, err := SimpleWork.GetStudentByID(ctxFromGin, s.conn, getIdUUID)
+	student, err := SimpleWork.GetStudentByID(ctxGin, s.conn, getIdUUID)
 	if err != nil {
 		newErr = structerr.Err{
 			Message: err.Error(),
@@ -112,9 +191,9 @@ func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) {
 
 func (s *HTTPhandler) HandlerGetAllStudents(c *gin.Context) {
 
-	ctxFromGin := c.Request.Context()
+	ctxGin := c.Request.Context()
 
-	studnets, err := SimpleWork.GetAllStudent(ctxFromGin, s.conn)
+	studnets, err := SimpleWork.GetAllStudent(ctxGin, s.conn)
 	if err != nil {
 		newErr = structerr.Err{
 			Message: err.Error(),
@@ -137,9 +216,9 @@ func (s *HTTPhandler) HandlerDeleteStudent(c *gin.Context) {
 		return
 	}
 
-	ctxFromGin := c.Request.Context()
+	ctxGin := c.Request.Context()
 
-	student, err := SimpleWork.GetStudentByID(ctxFromGin, s.conn, getIdUUID)
+	student, err := SimpleWork.GetStudentByID(ctxGin, s.conn, getIdUUID)
 	if err != nil {
 		newErr = structerr.Err{
 			Message: err.Error(),
@@ -148,7 +227,7 @@ func (s *HTTPhandler) HandlerDeleteStudent(c *gin.Context) {
 		return
 	}
 
-	err = SimpleWork.DeleteRow(ctxFromGin, s.conn, student)
+	err = SimpleWork.DeleteRow(ctxGin, s.conn, student)
 	if err != nil {
 		errSt := structerr.NewErr(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": errSt})

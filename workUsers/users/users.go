@@ -9,12 +9,11 @@ import (
 
 type Users struct {
 	Id       uuid.UUID `json:"id"`
-	Login    string    `json:"login"`
+	Email    string    `json:"email"`
 	Password string    `json:"_"`
 	Name     string    `json:"name"`
 	SurName  string    `json:"surname"`
 	LastName string    `json:"lastname"`
-	Gender   string    `json:"gender"`
 	Role     string    `json:"role"`
 }
 
@@ -29,12 +28,8 @@ func (u *Users) GetFullName() string {
 	return fullName
 }
 
-func (u *Users) GetGender() string {
-	return u.Gender
-}
-
 func (u *Users) GetDataUser() (login, pass string) {
-	return u.Login, u.Password
+	return u.Email, u.Password
 }
 
 //SETTER

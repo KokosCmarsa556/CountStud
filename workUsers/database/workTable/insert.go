@@ -17,12 +17,11 @@ func InsertRow(ctx context.Context, conn *pgx.Conn, u *users.Users) error {
 	if _, err := conn.Exec(
 		ctx,
 		sqlInsert,
-		u.Login,
+		u.Email,
 		u.Password,
 		u.Name,
 		u.SurName,
 		u.LastName,
-		u.Gender,
 		u.Role); err != nil {
 		return err
 	}
