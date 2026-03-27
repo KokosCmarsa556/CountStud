@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func DeleteRow(ctx context.Context, conn *pgx.Conn, u *user.User) error {
+func DeleteRow(ctx context.Context, conn *pgx.Conn, u *user.Student) error {
 	//Создаем запрос для удаления пользователя из БД. RETURNING id - проверяет есть ли такой пользователь или нет
 	sqlDelete := `
 		DELETE FROM students WHERE id = $1 RETURNING id;

@@ -7,8 +7,8 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func GetAllStudent(ctx context.Context, conn *pgx.Conn) ([]user.User, error) {
-	var students []user.User
+func GetAllStudent(ctx context.Context, conn *pgx.Conn) ([]user.Student, error) {
+	var students []user.Student
 	sqlGetAll := `
 		SELECT * FROM students
 	`
@@ -20,7 +20,7 @@ func GetAllStudent(ctx context.Context, conn *pgx.Conn) ([]user.User, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var u user.User
+		var u user.Student
 		if err := rows.Scan(
 			&u.Id,
 			&u.Name,

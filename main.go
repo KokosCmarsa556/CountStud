@@ -5,6 +5,7 @@ import (
 	simpleWork "CountStud/workStudent/database/simpleWork"
 	"CountStud/workStudent/handlers"
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -32,7 +33,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	ginRoute.POST("/useradmin/authorization", httpHandler.HandlerEntrance)
+	ginRoute.POST("/user/authorization", httpHandler.HandlerEntrance)
+	ginRoute.POST("/useradmin/registration", httpHandler.HandlerCreateAdmin)
+	ginRoute.POST("/user/registration", httpHandler.HandlerCreateUser)
 	ginRoute.POST("/student", httpHandler.HandlerCreateStudent)
+	ginRoute.PATCH("/student/createstudent", httpHandler.HandlerCreateStudent)
 	ginRoute.GET("/student/:id", httpHandler.HandlerGetStudentID)
 	ginRoute.GET("/students", httpHandler.HandlerGetAllStudents)
 	ginRoute.DELETE("/student/:id", httpHandler.HandlerDeleteStudent)
@@ -40,5 +46,7 @@ func main() {
 	// if err := simplework.InsertRow(ctx, conn, user.User.Name); err != nil {
 	// 	log.Fatal(err)
 	// }
+	fmt.Println("Сервер функционирует. Сервер работает на порту 8989")
 	ginRoute.Run(":8989")
+
 }

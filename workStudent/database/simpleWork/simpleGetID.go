@@ -9,13 +9,15 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func GetStudentByID(ctx context.Context, conn *pgx.Conn, id uuid.UUID) (*user.User, error) {
+func GetStudentByID(ctx context.Context, conn *pgx.Conn, id uuid.UUID) (*user.Student, error) {
 	//Создаем пустого студента куда в дальнейшем будут записываться данные пользователя, которого ищут
-	var student user.User
+	var student user.Student
 
 	// Создание SQL-запроса для получения пользователя по его id
 	sqlGetId := `
-		SELECT * FROM students WHERE id = $1; 
+		SELECT id, name, firstName, lastName, gender, address, iin 
+    FROM students 
+    WHERE id = $1;
 	`
 	/*
 		1) Отправка SQL-запроса в PostgreSQL
