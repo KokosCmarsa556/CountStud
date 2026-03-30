@@ -6,7 +6,7 @@ import (
 	usersSt "CountStud/workStudent/student"
 	userdto "CountStud/workStudent/userDTO"
 	worktable "CountStud/workUsers/database/workTable"
-	"CountStud/workUsers/users"
+	User "CountStud/workUsers/users"
 	"net/http"
 	"os"
 	"time"
@@ -32,7 +32,7 @@ func NewHttpHandlers(conn *pgx.Conn) *HTTPhandler {
 	}
 }
 
-func (s *HTTPhandler) createJWT(user users.Users) (string, error) {
+func (s *HTTPhandler) createJWT(user User.User) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": user.Id,
 		"role":    user.Role,
@@ -53,7 +53,7 @@ var newErr structerr.Err
 func (s *HTTPhandler) HandlerCreateAdmin(c *gin.Context) {
 
 	ctxGin := c.Request.Context()
-	user := users.Users{}
+	user := User.User{}
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		newErr = structerr.Err{
@@ -83,7 +83,7 @@ func (s *HTTPhandler) HandlerCreateAdmin(c *gin.Context) {
 func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
 
 	ctxGin := c.Request.Context()
-	user := users.Users{}
+	user := User.User{}
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		newErr = structerr.Err{

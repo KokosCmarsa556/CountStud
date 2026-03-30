@@ -1,15 +1,15 @@
 package worktable
 
 import (
-	"CountStud/workUsers/users"
+	User "CountStud/workUsers/users"
 	"context"
 	"fmt"
 
 	"github.com/jackc/pgx/v5"
 )
 
-func GetUser(ctx context.Context, conn *pgx.Conn, email string) (users.Users, error) {
-	var user users.Users
+func GetUser(ctx context.Context, conn *pgx.Conn, email string) (User.User, error) {
+	var user User.User
 	sqlGetUserId := `
 		SELECT Id, Email, Password, Name, SurName, LastName, Role 
     FROM students 
@@ -27,9 +27,9 @@ func GetUser(ctx context.Context, conn *pgx.Conn, email string) (users.Users, er
 		&user.Role,
 	); err != nil {
 		if err == pgx.ErrNoRows {
-			return users.Users{}, fmt.Errorf("user not found")
+			return User.User{}, fmt.Errorf("user not found")
 		}
-		return users.Users{}, err
+		return User.User{}, err
 	}
 	return user, nil
 }
