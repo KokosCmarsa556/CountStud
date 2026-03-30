@@ -50,36 +50,6 @@ func (s *HTTPhandler) createJWT(user User.User) (string, error) {
 
 var newErr structerr.Err
 
-func (s *HTTPhandler) HandlerCreateAdmin(c *gin.Context) {
-
-	ctxGin := c.Request.Context()
-	user := User.User{}
-
-	if err := c.ShouldBindJSON(&user); err != nil {
-		newErr = structerr.Err{
-			Message: err.Error(),
-		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
-		return
-	}
-	user.Role = "Admin"
-	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "ошибка хэширования"})
-		return
-	}
-	user.Password = string(hash)
-
-	if err := worktable.InsertRow(ctxGin, s.conn, &user); err != nil {
-		newErr = structerr.Err{
-			Message: err.Error(),
-		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
-		return
-	}
-	c.JSON(http.StatusOK, user)
-}
-
 func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
 
 	ctxGin := c.Request.Context()
@@ -140,8 +110,8 @@ func (s *HTTPhandler) HandlerEntrance(c *gin.Context) {
 		return
 	}
 
+	c.SetCookie("JWT", token, 3600*4, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,
 		"user": gin.H{
 			"id":    user.Id,
 			"email": user.Email,
@@ -215,6 +185,43 @@ func (s *HTTPhandler) HandlerGetAllStudents(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"error": studnets})
+}
+
+func (s *HTTPhandler) HandlerPatchStudent(c *gin.Context) {
+	ctxGin := c.Request.Context()
+
+	getIdString := c.Param("id")
+	getIdUUID, err := uuid.Parse(getIdString)
+	if err != nil {
+		newErr = structerr.Err{
+			Message: err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		return
+	}
+
+	userSt := usersSt.Student{}
+
+	if err := c.ShouldBindJSON(&userSt); err != nil {
+		newErr = *structerr.NewErr(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		return
+	}
+
+	err = SimpleWork.PatchStudent(ctxGin, s.conn, getIdUUID, userSt.Name, userSt.LastName, userSt.Address)
+	if err != nil {
+		if err.Error() == "not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "student not found"})
+			return
+		}
+		newErr = structerr.Err{
+			Message: err.Error(),
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": newErr})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func (s *HTTPhandler) HandlerDeleteStudent(c *gin.Context) {

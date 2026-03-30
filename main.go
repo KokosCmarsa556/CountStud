@@ -22,30 +22,25 @@ func main() {
 		log.Fatal("Ошибка загрузки .env файла")
 	}
 
-	// Создаем подключение к базе данных
 	conn, err := connection.CreateConnect(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 	httpHandler := handlers.NewHttpHandlers(conn)
-	// Выполняем создание таблицы
+
 	if err := simpleWork.CreateTable(ctx, conn); err != nil {
 		log.Fatal(err)
 	}
 
-	ginRoute.POST("/useradmin/authorization", httpHandler.HandlerEntrance)
+	//добавить обработчик обновления данных студента
 	ginRoute.POST("/user/authorization", httpHandler.HandlerEntrance)
-	ginRoute.POST("/useradmin/registration", httpHandler.HandlerCreateAdmin)
 	ginRoute.POST("/user/registration", httpHandler.HandlerCreateUser)
-	ginRoute.POST("/student", httpHandler.HandlerCreateStudent)
-	ginRoute.PATCH("/student/createstudent", httpHandler.HandlerCreateStudent)
+	ginRoute.POST("/student/createstudent", httpHandler.HandlerCreateStudent)
+	ginRoute.GET("/student", httpHandler.HandlerGetAllStudents)
+	ginRoute.PATCH("/student/:id", httpHandler.HandlerPatchStudent)
 	ginRoute.GET("/student/:id", httpHandler.HandlerGetStudentID)
-	ginRoute.GET("/students", httpHandler.HandlerGetAllStudents)
 	ginRoute.DELETE("/student/:id", httpHandler.HandlerDeleteStudent)
-	// Вставляем в БД
-	// if err := simplework.InsertRow(ctx, conn, user.User.Name); err != nil {
-	// 	log.Fatal(err)
-	// }
+
 	fmt.Println("Сервер функционирует. Сервер работает на порту 8989")
 	ginRoute.Run(":8989")
 
