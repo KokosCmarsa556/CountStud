@@ -1,4 +1,4 @@
-package users
+package User
 
 import (
 	"CountStud/structerr"
@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type Users struct {
+type User struct {
 	Id       uuid.UUID `json:"id"`
 	Email    string    `json:"email"`
 	Password string    `json:"_"`
@@ -17,24 +17,24 @@ type Users struct {
 	Role     string    `json:"role"`
 }
 
-func NewUser() *Users {
-	return &Users{}
+func NewUser() *User {
+	return &User{}
 }
 
 //GETTER
 
-func (u *Users) GetFullName() string {
+func (u *User) GetFullName() string {
 	fullName := u.LastName + u.Name + u.SurName
 	return fullName
 }
 
-func (u *Users) GetDataUser() (login, pass string) {
+func (u *User) GetDataUser() (login, pass string) {
 	return u.Email, u.Password
 }
 
 //SETTER
 
-func (u *Users) ChangeLastName(newLastName string) error {
+func (u *User) ChangeLastName(newLastName string) error {
 	if newLastName == "" {
 		return structerr.NewErr("The new surname is empty")
 	}
@@ -42,7 +42,7 @@ func (u *Users) ChangeLastName(newLastName string) error {
 	return nil
 }
 
-func (u *Users) ChangeName(newName string) error {
+func (u *User) ChangeName(newName string) error {
 	if newName == "" {
 		return structerr.NewErr("Name cannot be empty")
 	}
@@ -50,7 +50,7 @@ func (u *Users) ChangeName(newName string) error {
 	return nil
 }
 
-func (u *Users) ChangePassword(newPass string) error {
+func (u *User) ChangePassword(newPass string) error {
 	for _, r := range newPass {
 		if unicode.Is(unicode.Cyrillic, r) {
 			return structerr.NewErr("The password contains Cyrillic characters, it should only be in Latin.")

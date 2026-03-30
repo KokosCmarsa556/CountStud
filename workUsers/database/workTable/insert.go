@@ -1,13 +1,13 @@
 package worktable
 
 import (
-	"CountStud/workUsers/users"
+	User "CountStud/workUsers/users"
 	"context"
 
 	"github.com/jackc/pgx/v5"
 )
 
-func InsertRow(ctx context.Context, conn *pgx.Conn, u *users.Users) error {
+func InsertRow(ctx context.Context, conn *pgx.Conn, u *User.User) error {
 	//Создаем запрос. Не передаем id, т.к он генерируется у нас в PostgreSQL
 	sqlInsert := `
 		INSERT INTO users (Login, Password, Name, FirstName, LastName, Gender, Role)
