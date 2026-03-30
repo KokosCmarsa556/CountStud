@@ -23,7 +23,9 @@ func PatchStudent(ctx context.Context, conn *pgx.Conn, id uuid.UUID, name, lastn
 			return err
 		}
 	}
-
+	if name == "" && lastname == "" && address == "" {
+		return nil
+	}
 	if name != "" {
 		sqlPathUser := `
 		UPDATE students

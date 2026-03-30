@@ -34,11 +34,10 @@ func main() {
 
 	//добавить обработчик обновления данных студента
 	ginRoute.POST("/user/authorization", httpHandler.HandlerEntrance)
-	// ginRoute.POST("/useradmin/registration", httpHandler.HandlerCreateAdmin)
 	ginRoute.POST("/user/registration", httpHandler.HandlerCreateUser)
 	ginRoute.POST("/student/createstudent", httpHandler.HandlerCreateStudent)
 	ginRoute.GET("/student", httpHandler.HandlerGetAllStudents)
-	ginRoute.PATCH("/student/:id", httpHandler.HandlerCreateStudent)
+	ginRoute.PATCH("/student/:id", httpHandler.HandlerPatchStudent)
 	ginRoute.GET("/student/:id", httpHandler.HandlerGetStudentID)
 	ginRoute.DELETE("/student/:id", httpHandler.HandlerDeleteStudent)
 
