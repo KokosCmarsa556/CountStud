@@ -1,9 +1,9 @@
 package main
 
 import (
-	"CountStud/workStudent/database/connection"
-	simpleWork "CountStud/workStudent/database/simpleWork"
-	"CountStud/workStudent/handlers"
+	"CountStud/database/connection"
+	"CountStud/database/crud"
+	"CountStud/http/handlers"
 	"context"
 	"fmt"
 	"log"
@@ -28,7 +28,11 @@ func main() {
 	}
 	httpHandler := handlers.NewHttpHandlers(conn)
 
-	if err := simpleWork.CreateTable(ctx, conn); err != nil {
+	if err := crud.CreateTableStudent(ctx, conn); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := crud.CreateTableUser(ctx, conn); err != nil {
 		log.Fatal(err)
 	}
 

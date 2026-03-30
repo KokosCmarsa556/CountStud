@@ -1,7 +1,7 @@
 package User
 
 import (
-	"CountStud/structerr"
+	structerr "CountStud/error"
 	"unicode"
 
 	"github.com/google/uuid"

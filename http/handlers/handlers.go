@@ -1,12 +1,11 @@
 package handlers
 
 import (
-	structerr "CountStud/structerr"
-	SimpleWork "CountStud/workStudent/database/simpleWork"
-	usersSt "CountStud/workStudent/student"
-	userdto "CountStud/workStudent/userDTO"
-	worktable "CountStud/workUsers/database/workTable"
-	User "CountStud/workUsers/users"
+	"CountStud/database/crud"
+	structerr "CountStud/error"
+	"CountStud/userst/student"
+	User "CountStud/userst/user"
+	userdto "CountStud/userst/userDTO"
 	"net/http"
 	"os"
 	"time"
@@ -23,7 +22,7 @@ type HTTPhandler struct {
 }
 
 type studentsAll struct {
-	students []usersSt.Student
+	students []student.Student
 }
 
 func NewHttpHandlers(conn *pgx.Conn) *HTTPhandler {
@@ -70,7 +69,7 @@ func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
 	}
 	user.Password = string(hash)
 
-	if err := worktable.InsertRow(ctxGin, s.conn, &user); err != nil {
+	if err := crud.InsertRowUser(ctxGin, s.conn, &user); err != nil {
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
@@ -92,7 +91,7 @@ func (s *HTTPhandler) HandlerEntrance(c *gin.Context) {
 		return
 	}
 
-	user, err := worktable.GetUser(ctxGin, s.conn, userDTO.Email)
+	user, err := crud.GetUser(ctxGin, s.conn, userDTO.Email)
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "пользователь не найден"})
@@ -122,7 +121,7 @@ func (s *HTTPhandler) HandlerEntrance(c *gin.Context) {
 }
 
 func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
-	student := usersSt.Student{}
+	student := student.Student{}
 
 	ctxGin := c.Request.Context()
 
@@ -133,7 +132,7 @@ func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
 		return
 	}
-	err := SimpleWork.InsertRow(ctxGin, s.conn, &student)
+	err := crud.InsertRowInStudnet(ctxGin, s.conn, &student)
 
 	if err != nil {
 		newErr = structerr.Err{
@@ -159,7 +158,7 @@ func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) {
 
 	ctxGin := c.Request.Context()
 
-	student, err := SimpleWork.GetStudentByID(ctxGin, s.conn, getIdUUID)
+	student, err := crud.GetStudentByID(ctxGin, s.conn, getIdUUID)
 	if err != nil {
 		newErr = structerr.Err{
 			Message: err.Error(),
@@ -175,7 +174,7 @@ func (s *HTTPhandler) HandlerGetAllStudents(c *gin.Context) {
 
 	ctxGin := c.Request.Context()
 
-	studnets, err := SimpleWork.GetAllStudent(ctxGin, s.conn)
+	studnets, err := crud.GetAllStudent(ctxGin, s.conn)
 	if err != nil {
 		newErr = structerr.Err{
 			Message: err.Error(),
@@ -200,7 +199,7 @@ func (s *HTTPhandler) HandlerPatchStudent(c *gin.Context) {
 		return
 	}
 
-	userSt := usersSt.Student{}
+	userSt := student.Student{}
 
 	if err := c.ShouldBindJSON(&userSt); err != nil {
 		newErr = *structerr.NewErr(err.Error())
@@ -208,7 +207,7 @@ func (s *HTTPhandler) HandlerPatchStudent(c *gin.Context) {
 		return
 	}
 
-	err = SimpleWork.PatchStudent(ctxGin, s.conn, getIdUUID, userSt.Name, userSt.LastName, userSt.Address)
+	err = crud.PatchStudent(ctxGin, s.conn, getIdUUID, userSt.Name, userSt.LastName, userSt.Address)
 	if err != nil {
 		if err.Error() == "not found" {
 			c.JSON(http.StatusNotFound, gin.H{"error": "student not found"})
@@ -237,7 +236,7 @@ func (s *HTTPhandler) HandlerDeleteStudent(c *gin.Context) {
 
 	ctxGin := c.Request.Context()
 
-	student, err := SimpleWork.GetStudentByID(ctxGin, s.conn, getIdUUID)
+	student, err := crud.GetStudentByID(ctxGin, s.conn, getIdUUID)
 	if err != nil {
 		newErr = structerr.Err{
 			Message: err.Error(),
@@ -246,7 +245,7 @@ func (s *HTTPhandler) HandlerDeleteStudent(c *gin.Context) {
 		return
 	}
 
-	err = SimpleWork.DeleteRow(ctxGin, s.conn, student)
+	err = crud.DeleteRowInStudent(ctxGin, s.conn, student)
 	if err != nil {
 		errSt := structerr.NewErr(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": errSt})

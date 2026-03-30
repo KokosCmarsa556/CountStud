@@ -1,7 +1,7 @@
 package student
 
 import (
-	structerr "CountStud/structerr"
+	structerr "CountStud/error"
 
 	"github.com/google/uuid"
 )
