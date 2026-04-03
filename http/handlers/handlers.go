@@ -47,7 +47,7 @@ func (s *HTTPhandler) createJWT(user User.User) (string, error) {
 	return tokenString, nil
 }
 
-var newErr structerr.Err
+// var newErr structerr.Err
 
 func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
 
@@ -55,7 +55,7 @@ func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
 	user := User.User{}
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		newErr = structerr.Err{
+		newErr := structerr.Err{
 			Message: err.Error(),
 		}
 		c.Error(newErr)
@@ -65,14 +65,14 @@ func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
 	user.Role = "Teacher"
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.Error(newErr)
+		c.Error(err)
 		// c.JSON(http.StatusInternalServerError, gin.H{"error": "ошибка хэширования"})
 		return
 	}
 	user.Password = string(hash)
 
 	if err := crud.InsertRowUser(ctxGin, s.conn, &user); err != nil {
-		newErr = structerr.Err{
+		newErr := structerr.Err{
 			Message: err.Error(),
 		}
 		c.Error(newErr)
@@ -87,7 +87,7 @@ func (s *HTTPhandler) HandlerEntrance(c *gin.Context) {
 	userDTO := userdto.UserDTO{}
 
 	if err := c.ShouldBindJSON(&userDTO); err != nil {
-		newErr = structerr.Err{
+		newErr := structerr.Err{
 			Message: err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
@@ -101,7 +101,6 @@ func (s *HTTPhandler) HandlerEntrance(c *gin.Context) {
 		return
 	}
 	if errPass := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userDTO.Password)); errPass != nil {
-		newErr = *structerr.NewErr(errPass.Error())
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "неверный пароль"})
 		return
 	}
@@ -129,7 +128,7 @@ func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
 	ctxGin := c.Request.Context()
 
 	if err := c.ShouldBindJSON(&student); err != nil {
-		newErr = structerr.Err{
+		newErr := structerr.Err{
 			Message: err.Error(),
 		}
 		c.Error(newErr)
@@ -139,7 +138,7 @@ func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
 	err := crud.InsertRowInStudnet(ctxGin, s.conn, &student)
 
 	if err != nil {
-		newErr = structerr.Err{
+		newErr := structerr.Err{
 			Message: err.Error(),
 		}
 		c.Error(newErr)
@@ -154,7 +153,7 @@ func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) {
 	getIdString := c.Param("id")
 	getIdUUID, err := uuid.Parse(getIdString)
 	if err != nil {
-		newErr = structerr.Err{
+		newErr := structerr.Err{
 			Message: err.Error(),
 		}
 		c.Error(newErr)
@@ -166,11 +165,11 @@ func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) {
 
 	student, err := crud.GetStudentByID(ctxGin, s.conn, getIdUUID)
 	if err != nil {
-		newErr = structerr.Err{
+		newErr := structerr.Err{
 			Message: err.Error(),
 		}
-		c.Error(newErr)
-		// c.JSON(http.StatusNotFound, gin.H{"error": newErr})
+
+		c.JSON(http.StatusNotFound, gin.H{"error": newErr})
 		return
 	}
 
@@ -183,7 +182,7 @@ func (s *HTTPhandler) HandlerGetAllStudents(c *gin.Context) {
 
 	studnets, err := crud.GetAllStudent(ctxGin, s.conn)
 	if err != nil {
-		newErr = structerr.Err{
+		newErr := structerr.Err{
 			Message: err.Error(),
 		}
 		c.Error(newErr)
@@ -200,7 +199,7 @@ func (s *HTTPhandler) HandlerPatchStudent(c *gin.Context) {
 	getIdString := c.Param("id")
 	getIdUUID, err := uuid.Parse(getIdString)
 	if err != nil {
-		newErr = structerr.Err{
+		newErr := structerr.Err{
 			Message: err.Error(),
 		}
 		c.Error(newErr)
@@ -211,7 +210,7 @@ func (s *HTTPhandler) HandlerPatchStudent(c *gin.Context) {
 	userSt := student.Student{}
 
 	if err := c.ShouldBindJSON(&userSt); err != nil {
-		newErr = *structerr.NewErr(err.Error())
+		newErr := *structerr.NewErr(err.Error())
 		c.Error(newErr)
 		// c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
 		return
@@ -220,11 +219,11 @@ func (s *HTTPhandler) HandlerPatchStudent(c *gin.Context) {
 	err = crud.PatchStudent(ctxGin, s.conn, getIdUUID, userSt.Name, userSt.LastName, userSt.Address)
 	if err != nil {
 		if err.Error() == "not found" {
-			c.Error(newErr)
+			c.Error(err)
 			// c.JSON(http.StatusNotFound, gin.H{"error": "student not found"})
 			return
 		}
-		newErr = structerr.Err{
+		newErr := structerr.Err{
 			Message: err.Error(),
 		}
 		c.Error(newErr)
@@ -239,7 +238,7 @@ func (s *HTTPhandler) HandlerDeleteStudent(c *gin.Context) {
 	getIdString := c.Param("id")
 	getIdUUID, err := uuid.Parse(getIdString)
 	if err != nil {
-		newErr = structerr.Err{
+		newErr := structerr.Err{
 			Message: err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
@@ -250,7 +249,7 @@ func (s *HTTPhandler) HandlerDeleteStudent(c *gin.Context) {
 
 	student, err := crud.GetStudentByID(ctxGin, s.conn, getIdUUID)
 	if err != nil {
-		newErr = structerr.Err{
+		newErr := structerr.Err{
 			Message: err.Error(),
 		}
 		c.Error(newErr)
