@@ -58,13 +58,15 @@ func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		c.Error(newErr)
+		// c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
 		return
 	}
 	user.Role = "Teacher"
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "ошибка хэширования"})
+		c.Error(newErr)
+		// c.JSON(http.StatusInternalServerError, gin.H{"error": "ошибка хэширования"})
 		return
 	}
 	user.Password = string(hash)
@@ -73,7 +75,8 @@ func (s *HTTPhandler) HandlerCreateUser(c *gin.Context) {
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		c.Error(newErr)
+		// c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
 		return
 	}
 	c.JSON(http.StatusOK, user)
@@ -129,7 +132,8 @@ func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		c.Error(newErr)
+		// c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
 		return
 	}
 	err := crud.InsertRowInStudnet(ctxGin, s.conn, &student)
@@ -138,10 +142,11 @@ func (s *HTTPhandler) HandlerCreateStudent(c *gin.Context) {
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		c.Error(newErr)
+		// c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"error": student})
+	c.JSON(http.StatusOK, gin.H{"student": student})
 }
 
 func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) {
@@ -152,7 +157,8 @@ func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) {
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		c.Error(newErr)
+		// c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
 		return
 	}
 
@@ -163,7 +169,8 @@ func (s *HTTPhandler) HandlerGetStudentID(c *gin.Context) {
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
-		c.JSON(http.StatusNotFound, gin.H{"error": newErr})
+		c.Error(newErr)
+		// c.JSON(http.StatusNotFound, gin.H{"error": newErr})
 		return
 	}
 
@@ -179,11 +186,12 @@ func (s *HTTPhandler) HandlerGetAllStudents(c *gin.Context) {
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		c.Error(newErr)
+		// c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"error": studnets})
+	c.JSON(http.StatusOK, gin.H{"students": studnets})
 }
 
 func (s *HTTPhandler) HandlerPatchStudent(c *gin.Context) {
@@ -195,7 +203,8 @@ func (s *HTTPhandler) HandlerPatchStudent(c *gin.Context) {
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		c.Error(newErr)
+		// c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
 		return
 	}
 
@@ -203,20 +212,23 @@ func (s *HTTPhandler) HandlerPatchStudent(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&userSt); err != nil {
 		newErr = *structerr.NewErr(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
+		c.Error(newErr)
+		// c.JSON(http.StatusBadRequest, gin.H{"error": newErr})
 		return
 	}
 
 	err = crud.PatchStudent(ctxGin, s.conn, getIdUUID, userSt.Name, userSt.LastName, userSt.Address)
 	if err != nil {
 		if err.Error() == "not found" {
-			c.JSON(http.StatusNotFound, gin.H{"error": "student not found"})
+			c.Error(newErr)
+			// c.JSON(http.StatusNotFound, gin.H{"error": "student not found"})
 			return
 		}
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": newErr})
+		c.Error(newErr)
+		// c.JSON(http.StatusInternalServerError, gin.H{"error": newErr})
 		return
 	}
 
@@ -241,14 +253,16 @@ func (s *HTTPhandler) HandlerDeleteStudent(c *gin.Context) {
 		newErr = structerr.Err{
 			Message: err.Error(),
 		}
-		c.JSON(http.StatusNotFound, gin.H{"error": newErr})
+		c.Error(newErr)
+		// c.JSON(http.StatusNotFound, gin.H{"error": newErr})
 		return
 	}
 
 	err = crud.DeleteRowInStudent(ctxGin, s.conn, student)
 	if err != nil {
-		errSt := structerr.NewErr(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": errSt})
+		newErr := structerr.NewErr(err.Error())
+		c.Error(newErr)
+		// c.JSON(http.StatusBadRequest, gin.H{"error": errSt})
 		return
 	}
 }
