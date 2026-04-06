@@ -2,8 +2,10 @@ package midlleware
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -93,5 +95,21 @@ func CORSMiddleware() gin.HandlerFunc {
 		}
 
 		c.Next()
+	}
+}
+
+func RequestLoggerMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		startTime := time.Now()
+
+		c.Next()
+
+		duration := time.Since(startTime)
+		clientIp := c.ClientIP()
+		method := c.Request.Method
+		path := c.Request.URL.Path
+		statusCode := c.Writer.Status()
+
+		log.Printf("Request: %s %s from %s | Status: %d | Duration: %s", method, path, clientIp, statusCode, duration)
 	}
 }
