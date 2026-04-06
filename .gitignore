@@ -30,3 +30,5 @@
 *.tmp
 
 *.gitignore
+
+*README.md
