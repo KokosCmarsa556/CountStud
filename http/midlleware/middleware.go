@@ -1,4 +1,4 @@
-package midlleware
+package middleware
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/time/rate"
 )
 
 func ErrorMiddleware() gin.HandlerFunc {
@@ -70,26 +71,53 @@ func JWTMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		role := claims["role"].(string)
+		c.Set("role", role)
+		c.Next()
 
-		c.Set("user_id", claims["user_id"])
-		c.Set("role", claims["role"])
+		// c.Set("user_id", claims["user_id"])
+		// c.Set("role", claims["role"])
+
+	}
+}
+
+func requireRole(requileRole string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, exists := c.Get("role")
+		if !exists || role != requileRole {
+			c.JSON(403, gin.H{"error": "Insufficient permissions"})
+			c.Abort()
+		}
 		c.Next()
 	}
 }
 
 func CORSMiddleware() gin.HandlerFunc {
+	allowedOrigins := map[string]bool{
+		"http://localhost:3000": true,
+		"https://myapp.com":     true,
+	}
+
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
 
-		if origin == "http://localhost:3000" {
+		if allowedOrigins[origin] {
 			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
 		}
 
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+		c.Writer.Header().Set(
+			"Access-Control-Allow-Headers",
+			"Content-Type, Authorization, X-Requested-With, Accept",
+		)
+		c.Writer.Header().Set(
+			"Access-Control-Allow-Methods",
+			"GET, POST, PUT, PATCH, DELETE, OPTIONS",
+		)
+		c.Writer.Header().Set("Access-Control-Max-Age", "3600")
 
 		if c.Request.Method == "OPTIONS" {
+			log.Printf("Preflight request from %s", origin)
 			c.AbortWithStatus(204)
 			return
 		}
@@ -111,5 +139,15 @@ func RequestLoggerMiddleware() gin.HandlerFunc {
 		statusCode := c.Writer.Status()
 
 		log.Printf("Request: %s %s from %s | Status: %d | Duration: %s", method, path, clientIp, statusCode, duration)
+	}
+}
+
+func RateLimiter(l *rate.Limiter) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !l.Allow() {
+			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{"error": "Too many requests"})
+			return
+		}
+		c.Next()
 	}
 }
